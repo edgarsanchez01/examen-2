@@ -1,62 +1,14 @@
-<script>
-import ProgressBar from './ProgressBar.vue';
-import TotalProyectos from './TotalProyectos.vue';
-import TotalProyectos1 from './TotalProyectos.vue';
-export default {
-    data: () => ({
-        proyecto: "",
-        tipo: "",
-        urgente: false,
-        proyectos: [],
-    }),
-    methods: {
-        registrarProyecto() {
-            const proyecto = {
-                proyecto: this.proyecto,
-                tipo: this.tipo,
-                urgente: this.urgente,
-                completado: false,
-            };
-            this.proyectos.push(proyecto);
-            this.proyecto = "";
-            this.tipo = "";
-            this.urgente = false;
-        },
-        cambiarEstado(proyecto, campo) {
-            // el signo de admiracion lo cambia
-            // this.proyectos[id].urgente = !this.proyectos[id].urgente;
-            // console.log(proyecto, campo);
-            proyecto[campo] = !proyecto[campo];
-        }
-    },
-    // propiedades computadas
-    computed: {
-        numeroProyectos() {
-            return this.proyectos.length;
-        },
-        porcentaje() {
-            let completados = 0;
-            this.proyectos.map(proyecto => {
-                if (proyecto.completado)
-                    completados++;
-            });
-            return (completados * 100) / this.numeroProyectos || 0;
-        }
-    },
-    components: { ProgressBar, TotalProyectos, TotalProyectos1 }
-};
-</script>
 <template>
 
     <div class="row">
         <div class="col-12 mb-4">
-            <progress-bar :porcentaje="porcentaje"/>
+            <progress-bar :porcentaje="porcentaje" />
         </div>
 
         <div class="col-12 col-md-4">
             <form @submit.prevent="registrarProyecto">
                 <div class="mb-3">
-                    <label class="form-label">Proyecto</label>
+                    <label class="form-label">Proyectos</label>
                     <input v-model.trim="proyecto" type="text" class="form-control" required />
                 </div>
 
@@ -81,10 +33,78 @@ export default {
         </div>
         <div class="col-12 col-md-8">
             <hr>
-            <total-proyectos :numeroProyectos="numeroProyectos" :proyectos="proyectos" :cambiarEstado="cambiarEstado"/>
+            <total-proyectos :numeroProyectos="numeroProyectos" :proyectos="proyectos" :cambiarEstado="cambiarEstado"
+                :limpiarData="limpiarData" />
         </div>
     </div>
 
 </template>
 
+<script>
+import { onMounted } from 'vue';
+import ProgressBar from './ProgressBar.vue';
+import TotalProyectos from './TotalProyectos.vue';
+export default {
+    data: () => ({
+        proyecto: "",
+        tipo: "",
+        urgente: false,
+        proyectos: [],
+    }),
+    methods: {
+        registrarProyecto() {
+            const proyecto = {
+                proyecto: this.proyecto,
+                tipo: this.tipo,
+                urgente: this.urgente,
+                completado: false,
+            };
+            this.proyectos.push(proyecto);
+
+            this.saveData();
+
+            this.proyecto = "";
+            this.tipo = "";
+            this.urgente = false;
+        },
+        cambiarEstado(proyecto, campo) {
+            // el signo de admiracion lo cambia
+            // this.proyectos[id].urgente = !this.proyectos[id].urgente;
+            // console.log(proyecto, campo);
+            proyecto[campo] = !proyecto[campo];
+            this.saveData();
+
+        },
+        saveData() {
+            localStorage.setItem("proyectos", JSON.stringify(this.proyectos));
+        },
+        limpiarData() {
+            this.proyectos = [];
+            localStorage.clear();
+        },
+
+    },
+    // propiedades computadas
+    computed: {
+        numeroProyectos() {
+            return this.proyectos.length;
+        },
+        porcentaje() {
+            let completados = 0;
+            this.proyectos.map(proyecto => {
+                if (proyecto.completado)
+                    completados++;
+            });
+            return (completados * 100) / this.numeroProyectos || 0;
+        }
+    },
+    components: {
+        ProgressBar,
+        TotalProyectos,
+    },
+    mounted() {
+        this.proyectos = JSON.parse(localStorage.getItem("proyectos")) || [];
+    },
+};
+</script>
 
