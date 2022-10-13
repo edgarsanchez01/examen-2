@@ -34,7 +34,7 @@
         <div class="col-12 col-md-8">
             <hr>
             <total-proyectos :numeroProyectos="numeroProyectos" :proyectos="proyectos" :cambiarEstado="cambiarEstado"
-                :limpiarData="limpiarData" />
+                :limpiarData="limpiarData" :borrarProyecto="borrarProyecto"/>
         </div>
     </div>
 
@@ -82,7 +82,10 @@ export default {
             this.proyectos = [];
             localStorage.clear();
         },
-
+        borrarProyecto(index) {
+            this.proyectos.splice(index,1);
+            this.saveData();
+        },
     },
     // propiedades computadas
     computed: {
@@ -107,4 +110,3 @@ export default {
     },
 };
 </script>
-
